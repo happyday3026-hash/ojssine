@@ -173,6 +173,9 @@ body {
   background:rgba(200,160,80,0.3); z-index:-1; border-radius:1px;
 }
 .hook-sub { font-size:14px; color:var(--ink-mid); line-height:2.1; }
+.type-line { display:inline-block; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+.cursor { display:inline-block; width:2px; height:1em; background:var(--ink); vertical-align:middle; animation:blink .7s infinite; margin-left:2px; }
 
 .divider {
   display:flex; align-items:center; gap:10px;
@@ -232,7 +235,14 @@ body {
   transition:transform .2s, box-shadow .2s;
   cursor:default;
 }
-.route-card:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(80,60,40,0.12); }
+.route-card:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 8px 24px rgba(80,60,40,0.18); }
+.route-card { animation: cardFloat 3s ease-in-out infinite; }
+.route-card.r2 { animation-delay: 1.5s; }
+@keyframes cardFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-4px); }
+}
+.route-card:hover { animation: none; transform:translateY(-4px) scale(1.02); }
 .route-card::before { content:''; position:absolute; top:0;left:0; width:4px; height:100%; }
 .r1::before { background:var(--tile-1); }
 .r2::before { background:var(--tile-2); }
@@ -292,6 +302,14 @@ body {
   display:flex; align-items:center; justify-content:center;
   flex-direction:column; gap:4px;
   background:var(--cs);
+  animation: photoFloat 4s ease-in-out infinite;
+}
+.char-tile:nth-child(2) .photo { animation-delay: 1s; }
+.char-tile:nth-child(3) .photo { animation-delay: 2s; }
+.char-tile:nth-child(4) .photo { animation-delay: 3s; }
+@keyframes photoFloat {
+  0%,100% { transform:translateY(0px); }
+  50% { transform:translateY(-6px); }
 }
 .photo img { width:100%; height:100%; object-fit:cover; display:block; }
 .ph-e { font-size:32px; }
@@ -372,6 +390,15 @@ body {
 .persona-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px 14px; }
 .pi { font-size:12px; color:var(--ink-mid); display:flex; gap:6px; line-height:2.1; }
 .pi .pl { font-weight:700; color:var(--ink); min-width:40px; font-size:11px; }
+
+.copy-btn {
+  font-size:11px; font-weight:700; color:var(--point);
+  background:rgba(200,105,74,0.1); border:1px solid rgba(200,105,74,0.25);
+  border-radius:20px; padding:3px 10px; cursor:pointer;
+  transition:all .2s; white-space:nowrap;
+}
+.copy-btn:active { background:rgba(200,105,74,0.25); transform:scale(.95); }
+.copy-btn.copied { color:#4caf50; background:rgba(76,175,80,0.1); border-color:rgba(76,175,80,0.25); }
 
 .tips { display:flex; flex-direction:column; gap:5px; }
 .tip { font-size:12px; color:var(--ink-mid); display:flex; gap:6px; line-height:1.7; }
@@ -556,8 +583,8 @@ body {
       <div class="hook">
         <p class="hook-label">🌸 경주 오씨네 사용설명서</p>
         <div class="hook-main">
-          낮게 깔린 기와지붕 아래,<br>
-          <span class="hl">전혀 다른 네 명의 온도가 산다.</span>
+          <span class="type-line" id="typeLine1"></span><br>
+          <span class="hl type-line" id="typeLine2" style="opacity:0;"></span>
         </div>
         <p class="hook-sub">
           말 없는 소방관, 까칠한 경찰,<br>
@@ -589,8 +616,8 @@ body {
           </div>
           <div class="route-card r2">
             <div class="rbadge">Route 2</div>
-            <h3>🏠 마당에 남자 넷</h3>
-            <p>저녁 무렵 도착한 오씨네.<br>문 열어준 건 재한, 두 글자. "왔나."</p>
+            <h3>👟 새 운동화와 된장찌개</h3>
+            <p>입학식 날, 시우가 먼저였다.<br>따라갔더니 남자가 셋 더 있었다.</p>
           </div>
         </div>
       </div>
@@ -703,20 +730,35 @@ body {
             <li>시우랑 새벽에 편의점 가출하기</li>
             <li>넷이서 명절 고향 아버지 댁 방문하기</li>
             <li>집안일 분담 전쟁 휘말리기</li>
-            <li>명령어는 추후 업데이트 예정!</li>
           </ul>
 
+          <div class="persona-box" style="margin-top:14px;">
+            <h5>⌨️ 명령어</h5>
+            <div class="persona-grid">
+              <div class="pi"><span class="pl">!체크</span><span>AI 진단 리포트 출력</span></div>
+              <div class="pi"><span class="pl">!요약</span><span>최근 30턴 서사 요약</span></div>
+              <div class="pi"><span class="pl">!이벤트</span><span>오씨네 돌발 이벤트 트리거</span></div>
+              <div class="pi"><span class="pl">!캠퍼스</span><span>학교·알바·경주시내 서사 트리거</span></div>
+              <div class="pi"><span class="pl">!단톡</span><span>가족 단톡방 카카오톡 출력</span></div>
+            </div>
+          </div>
+
           <div class="persona-box">
-            <h5>유저 페르소나 예시</h5>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+              <h5 style="margin-bottom:0;">유저 페르소나 예시</h5>
+              <button class="copy-btn" onclick="copyPersona()" id="copyPersonaBtn">📋 복사</button>
+            </div>
             <div class="persona-grid">
               <div class="pi"><span class="pl">이름</span><span>:</span></div>
               <div class="pi"><span class="pl">성별</span><span>:</span></div>
               <div class="pi"><span class="pl">나이</span><span>:</span></div>
               <div class="pi"><span class="pl">외형</span><span>:</span></div>
               <div class="pi"><span class="pl">성격</span><span>:</span></div>
-              <div class="pi"><span class="pl">체향</span><span>:</span></div>
-              <div class="pi"><span class="pl">습관</span><span>:</span></div>
               <div class="pi"><span class="pl">좋아함</span><span>:</span></div>
+              <div class="pi"><span class="pl">싫어함</span><span>:</span></div>
+              <div class="pi"><span class="pl">애인유무</span><span>:</span></div>
+              <div class="pi"><span class="pl">습관</span><span>:</span></div>
+              <div class="pi"><span class="pl">특기</span><span>:</span></div>
             </div>
           </div>
 
@@ -759,6 +801,7 @@ body {
     <!-- JS로 내용 채워짐 -->
   </div>
 </div>
+
 
 <script>
 /* ── 캐릭터 데이터 ── */
@@ -946,6 +989,67 @@ function showMain() {
 }
 
 /* ── 음악 ── */
+function typeWriter(el, text, speed, cb) {
+  let i = 0;
+  el.textContent = '';
+  function tick() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      setTimeout(tick, speed);
+    } else { if(cb) cb(); }
+  }
+  tick();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const line1 = document.getElementById('typeLine1');
+  const line2 = document.getElementById('typeLine2');
+  if (!line1 || !line2) return;
+
+  setTimeout(() => {
+    typeWriter(line1, '낮게 깔린 기와지붕 아래,', 60, () => {
+      setTimeout(() => {
+        line2.style.opacity = '1';
+        line2.style.transition = 'opacity .3s';
+        typeWriter(line2, '전혀 다른 네 명의 온도가 산다.', 60);
+      }, 400);
+    });
+  }, 600);
+});
+
+function copyPersona() {
+  const text = `이름: 
+성별: 
+나이: 
+외형: 
+성격: 
+좋아함: 
+싫어함: 
+애인유무: 
+습관: 
+특기: `;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyPersonaBtn');
+    btn.textContent = '✅ 복사됨';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 복사';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copyPersonaBtn');
+    btn.textContent = '✅ 복사됨';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
 let playing = false;
 
 window.addEventListener('DOMContentLoaded', () => {
